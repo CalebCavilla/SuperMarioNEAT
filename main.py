@@ -1,40 +1,41 @@
+# OS imports
 import os
-os.environ["PYTHONWARNINGS"] = "ignore"
-
 import warnings
+os.environ["PYTHONWARNINGS"] = "ignore"
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+# gym environment imports
 import gym
 import gym_super_mario_bros
 from nes_py.wrappers import JoypadSpace
-from gym_super_mario_bros.actions import SIMPLE_MOVEMENT
+from gym_super_mario_bros.actions import RIGHT_ONLY
 
-# Create environment
-env = gym_super_mario_bros.make("SuperMarioBros-v0")
+# wrapper import
+from wrapper import apply_wrappers
 
-# Simplify action space
-env = JoypadSpace(env, SIMPLE_MOVEMENT)
+# Set up the environment
+ENV_NAME = "SuperMarioBros-1-1-v0"
+env = gym_super_mario_bros.make(ENV_NAME)
+env = JoypadSpace(env, RIGHT_ONLY)
+env = apply_wrappers(env)
 
-# Reset environment
-state = env.reset()
+NUM_OF_EPISODES = 5
 
-done = False
-total_reward = 0
+for episode in range(NUM_OF_EPISODES):
+    state = env.reset()
+    done = False
+    total_reward = 0
 
-while True:
-    # Random action (just testing environment)
-    action = env.action_space.sample()
+    print(f"Episode {episode + 1} started")
+    print("State shape:", state.shape)
 
-    state, reward, done, info = env.step(action)
-    total_reward += reward
+    while not done:
+        action = env.action_space.sample()
+        state, reward, done, info = env.step(action)
+        total_reward += reward
+        env.render()
 
-    # Render the game
-    env.render()
-
-    if done:
-        print("Episode finished!")
-        print("Total reward:", total_reward)
-        total_reward = 0
-        state = env.reset()
+    print("Episode finished!")
+    print("Total reward:", total_reward)
 
 env.close()
