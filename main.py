@@ -15,9 +15,11 @@ from wrapper import apply_wrappers
 
 # Set up the environment
 ENV_NAME = "SuperMarioBros-1-1-v0"
-env = gym_super_mario_bros.make(ENV_NAME)
-env = JoypadSpace(env, RIGHT_ONLY)
-env = apply_wrappers(env)
+def env_setup(evn_name):
+    env = gym_super_mario_bros.make(evn_name)
+    env = JoypadSpace(env, RIGHT_ONLY)
+    env = apply_wrappers(env)
+    return env
 
 NUM_OF_EPISODES = 5
 
@@ -37,5 +39,8 @@ for episode in range(NUM_OF_EPISODES):
 
     print("Episode finished!")
     print("Total reward:", total_reward)
+
+
+def fitness_functon()
 
 env.close()
