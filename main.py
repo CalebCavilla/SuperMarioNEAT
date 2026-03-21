@@ -16,6 +16,7 @@ from wrapper import apply_wrappers
 # utility imports
 import neat
 import numpy as np
+import pickle
 
 # Set up the environment
 ENV_NAME = "SuperMarioBros-1-1-v0"
@@ -24,8 +25,6 @@ def env_setup(evn_name):
     env = JoypadSpace(env, RIGHT_ONLY)
     env = apply_wrappers(env)
     return env
-
-NUM_OF_EPISODES = 5
 
 def eval_genomes(genomes, config):
 
@@ -51,5 +50,32 @@ def eval_genomes(genomes, config):
             if (x_pos > max_x_pos):
                 max_x_pos = x_pos
         
-        genome.fitness = max_x_pos + total_reward
+        genome.fitness = max_x_pos + total_reward * 0.1
         env.close()
+
+def train_neat(config_path):
+    config = neat.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_path
+    )
+
+    population = neat.Population(config)
+
+    population.add_reporter(neat.StdOutReporter(True))
+    stats = neat.StatisticsReporter()
+    population.add_reporter(stats)
+
+    winner = population.run(eval_genomes, 50)
+
+    with open("best_genome.pkl", "wb") as f:
+        pickle.dump(winner, f)
+
+    print("\nBest genome saved!")
+
+if __name__ == "__main__":
+    local_dir = os.path.dirname(__file__)
+    config_path = os.path.join(local_dir, "config-feedforward.txt")
+    train_neat(config_path)
