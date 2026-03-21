@@ -37,6 +37,7 @@ def eval_genomes(genomes, config):
         done = False
         total_reward = 0
         max_x_pos = 0
+        idle_timer = 150
 
         while not done:
             inputs = np.array(state).flatten()
@@ -49,8 +50,16 @@ def eval_genomes(genomes, config):
             x_pos = info.get("x_pos", 0)
             if (x_pos > max_x_pos):
                 max_x_pos = x_pos
+                idle_timer = 150
+            else:
+                idle_timer -= 1
+
+            if idle_timer <= 0:
+                break
+            
+            env.render()
         
-        genome.fitness = max_x_pos + total_reward * 0.1
+        genome.fitness = max_x_pos
         env.close()
 
 def train_neat(config_path):
@@ -68,7 +77,7 @@ def train_neat(config_path):
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
 
-    winner = population.run(eval_genomes, 50)
+    winner = population.run(eval_genomes, 15)
 
     with open("best_genome.pkl", "wb") as f:
         pickle.dump(winner, f)
@@ -77,5 +86,5 @@ def train_neat(config_path):
 
 if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config-feedforward.txt")
+    config_path = os.path.join(local_dir, "config.txt")
     train_neat(config_path)
