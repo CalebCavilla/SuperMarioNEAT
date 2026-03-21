@@ -15,6 +15,7 @@ from wrapper import apply_wrappers
 
 # utility imports
 import neat
+from neat.parallel import ParallelEvaluator
 import numpy as np
 import pickle
 
@@ -26,41 +27,37 @@ def env_setup(evn_name):
     env = apply_wrappers(env)
     return env
 
-def eval_genomes(genomes, config):
+def eval_genome(genome, config):
 
-    for genome_id, genome in genomes:
-        genome.fitness = 0.0
-        network = neat.nn.FeedForwardNetwork.create(genome, config)
-        env = env_setup(ENV_NAME)
+    network = neat.nn.FeedForwardNetwork.create(genome, config)
+    env = env_setup(ENV_NAME)
 
-        state = env.reset()
-        done = False
-        total_reward = 0
-        max_x_pos = 0
-        idle_timer = 150
+    state = env.reset()
+    done = False
+    max_x_pos = 0
+    idle_timer = 150
 
-        while not done:
-            inputs = np.array(state).flatten()
-            outputs = network.activate(inputs)
-            action = int(np.argmax(outputs))
+    while not done:
+        inputs = np.array(state).flatten()
+        outputs = network.activate(inputs)
+        action = int(np.argmax(outputs))
 
-            state, reward, done, info = env.step(action)
-
-            total_reward += reward
-            x_pos = info.get("x_pos", 0)
-            if (x_pos > max_x_pos):
-                max_x_pos = x_pos
-                idle_timer = 150
-            else:
-                idle_timer -= 1
-
-            if idle_timer <= 0:
-                break
-            
-            env.render()
+        state, reward, done, info = env.step(action)
         
-        genome.fitness = max_x_pos
-        env.close()
+        x_pos = info.get("x_pos", 0)
+        if (x_pos > max_x_pos):
+            max_x_pos = x_pos
+            idle_timer = 150
+        else:
+            idle_timer -= 1
+
+        if idle_timer <= 0:
+            break
+
+        env.render()
+    
+    env.close()
+    return max_x_pos
 
 def train_neat(config_path):
     config = neat.Config(
@@ -77,7 +74,10 @@ def train_neat(config_path):
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
 
-    winner = population.run(eval_genomes, 15)
+    num_workers = max(1, os.cpu_count() - 1)
+
+    with ParallelEvaluator(num_workers, eval_genome) as pe:
+        winner = population.run(pe.evaluate, 5)
 
     with open("best_genome.pkl", "wb") as f:
         pickle.dump(winner, f)
