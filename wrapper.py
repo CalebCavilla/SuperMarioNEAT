@@ -30,6 +30,6 @@ def apply_wrappers(env):
     Has the effect of combining 16 frames into one state
     """
     env = SkipFrame(env, skip=4) # number of frames to apply one action to
-    env = ResizeObservation(env, shape=16) # changes the dimensions of a frame to 84x84, reduces computational load
+    env = ResizeObservation(env, shape=16) # changes the dimensions of a frame to 16x16, reduces computational load
     env = GrayScaleObservation(env) # changes frame from rgb channels to just one, grey scale. Reduces computational load
     return env

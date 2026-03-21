@@ -13,6 +13,10 @@ from gym_super_mario_bros.actions import RIGHT_ONLY
 # wrapper import
 from wrapper import apply_wrappers
 
+# utility imports
+import neat
+import numpy as np
+
 # Set up the environment
 ENV_NAME = "SuperMarioBros-1-1-v0"
 def env_setup(evn_name):
@@ -23,24 +27,29 @@ def env_setup(evn_name):
 
 NUM_OF_EPISODES = 5
 
-for episode in range(NUM_OF_EPISODES):
-    state = env.reset()
-    done = False
-    total_reward = 0
+def eval_genomes(genomes, config):
 
-    print(f"Episode {episode + 1} started")
-    print("State shape:", state.shape)
+    for genome_id, genome in genomes:
+        genome.fitness = 0.0
+        network = neat.nn.FeedForwardNetwork.create(genome, config)
+        env = env_setup(ENV_NAME)
 
-    while not done:
-        action = env.action_space.sample()
-        state, reward, done, info = env.step(action)
-        total_reward += reward
-        env.render()
+        state = env.reset()
+        done = False
+        total_reward = 0
+        max_x_pos = 0
 
-    print("Episode finished!")
-    print("Total reward:", total_reward)
+        while not done:
+            inputs = np.array(state).flatten()
+            outputs = network.activate(inputs)
+            action = int(np.argmax(outputs))
 
+            state, reward, done, info = env.step(action)
 
-def fitness_functon()
-
-env.close()
+            total_reward += reward
+            x_pos = info.get("x_pos", 0)
+            if (x_pos > max_x_pos):
+                max_x_pos = x_pos
+        
+        genome.fitness = max_x_pos + total_reward
+        env.close()
