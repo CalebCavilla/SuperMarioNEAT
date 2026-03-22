@@ -18,6 +18,7 @@ import neat
 from neat.parallel import ParallelEvaluator
 import numpy as np
 import pickle
+from bestGenomeReporter import BestGenomeReporter
 
 
 # Set up the environment
@@ -76,6 +77,7 @@ def train_neat(config_path):
     population.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     population.add_reporter(stats)
+    population.add_reporter(BestGenomeReporter())
 
     num_workers = max(1, os.cpu_count() - 1)
 
