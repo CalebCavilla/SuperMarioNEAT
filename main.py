@@ -19,6 +19,7 @@ from neat.parallel import ParallelEvaluator
 import numpy as np
 import pickle
 
+
 # Set up the environment
 ENV_NAME = "SuperMarioBros-1-1-v0"
 def env_setup(evn_name):
@@ -34,8 +35,9 @@ def eval_genome(genome, config):
 
     state = env.reset()
     done = False
-    max_x_pos = 0
+    max_x_pos = 40
     idle_timer = 150
+    step = 0
 
     while not done:
         inputs = np.array(state).flatten()
@@ -43,8 +45,10 @@ def eval_genome(genome, config):
         action = int(np.argmax(outputs))
 
         state, reward, done, info = env.step(action)
-        
-        x_pos = info.get("x_pos", 0)
+        step += 1
+
+        x_pos = info.get("x_pos")
+
         if (x_pos > max_x_pos):
             max_x_pos = x_pos
             idle_timer = 150
@@ -53,11 +57,10 @@ def eval_genome(genome, config):
 
         if idle_timer <= 0:
             break
-
-        env.render()
     
     env.close()
-    return max_x_pos
+
+    return max_x_pos - 0.1*step
 
 def train_neat(config_path):
     config = neat.Config(
@@ -77,7 +80,7 @@ def train_neat(config_path):
     num_workers = max(1, os.cpu_count() - 1)
 
     with ParallelEvaluator(num_workers, eval_genome) as pe:
-        winner = population.run(pe.evaluate, 5)
+        winner = population.run(pe.evaluate, 2000)
 
     with open("best_genome.pkl", "wb") as f:
         pickle.dump(winner, f)
