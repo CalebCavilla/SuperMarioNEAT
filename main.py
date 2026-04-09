@@ -46,7 +46,7 @@ def create_parser():
     train_parser.add_argument("--report_stats", action="store_true", default=True, help="Reports per generation stats to the console like best_fitness and speciation")
     train_parser.add_argument("--no_report_stats", action="store_false", dest="report_stats", help="Prevents stat reporting in console")
     train_parser.add_argument("--save_checkpoints", type=str, default=None, help="The Path to the folder where checkpoints are saved (if not set, checkpoints are NOT saved)")
-    train_parser.add_argument("--checkpoint_interval", type=int, default=10, help="How many generations per checkpoint save")
+    train_parser.add_argument("--checkpoint_interval", type=int, default=100, help="How many generations per checkpoint save")
     train_parser.add_argument("--save_genomes", type=str, default=None, help="Saves genomes for replay (if not set, genomes are NOT saved)")
     train_parser.set_defaults(func=train)
 
