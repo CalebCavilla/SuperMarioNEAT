@@ -10,8 +10,21 @@ After training the bot for ~10 hrs over 2235 generations, the NEAT algorithm pro
 
 # Environment Setup (Windows)
 
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
+Requires Python 3.8.2
+
+## Clone the repository
+```
+cd <desired-folder>
+git clone https://github.com/CalebCavilla/SuperMarioNEAT
+cd SuperMarioNEAT
+```
+## Create virtual environment
+```python -3.8 -m venv venv```
+
+## Activate the Environment
+```venv\Scripts\activate```
+
+## Install dependencies
+```pip install -r requirements.txt```
 
 # Usage
