@@ -41,13 +41,13 @@ To train the bot from scratch with no options (default config, 2500 generations,
 
 ### Optional Arguments:
 ```
--- config <config_path> # defaults to path already present in the repo, can ignore unless imported custom config.
--- generations <int> # The number of generations to train for, defaults to 2500.
--- resume_training <load_path> # The path to the checkpoint file to resume training from. (If not set, training will begin from fresh population)
--- no_report_stats # Prevents stat reporting in console during training. (Enabled by default)
+-- config <config_path>         # defaults to path already present in the repo, can ignore unless imported custom config.
+-- generations <int>            # The number of generations to train for, defaults to 2500.
+-- resume_training <load_path>  # The path to the checkpoint file to resume training from. (If not set, training will begin from fresh population)
+-- no_report_stats              # Prevents stat reporting in console during training. (Enabled by default)
 -- save_checkpoints <save_path> # The Path to the folder where checkpoints are to be saved, creates folder if path does not exist. (if not set, checkpoints are NOT saved)
--- checkpoint_interval <int> # How many generations per checkpoint save, defaults to 100
--- save_genomes <save_path> # The path to the folder to save genomes for replay, creates folder if path does not exist (if not set, genomes are NOT saved)
+-- checkpoint_interval <int>    # How many generations per checkpoint save, defaults to 100
+-- save_genomes <save_path>     # The path to the folder to save genomes for replay, creates folder if path does not exist (if not set, genomes are NOT saved)
 ```
 ### Examples:
 
