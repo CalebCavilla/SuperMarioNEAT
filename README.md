@@ -6,4 +6,12 @@ This is a university project for learning neuroevolution by programming and trai
 
 https://github.com/user-attachments/assets/17d98a88-48c2-4cd0-a056-747a950ec7b7
 
-After training the bot for ~10 hrs over 2235 generations, the NEAT algorithm produces a top performer Network capable of completing world 1-1 with 100% certainty.
+After training the bot for ~10 hrs over 2235 generations, the NEAT algorithm produces a top performer Network capable of completing world 1-1 with 100% certainty. The entire genome history, neat-checkpoint histroy, final video, and final genome can be found in the Solution folder. If you wish to reproduce my exact setup deterministcally, run train.py on neat-checkpoint-371 (we lost the first 370 generations :< ).
+
+# Environment Setup (Windows)
+
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+
+# Usage
