@@ -1,6 +1,6 @@
 # Super Mario Bro's NEAT
 
-This is a university project for learning neuroevolution by programming and training a bot to complete the first level of the original Super Mario Bros. for the NES using the NEAT (Neuro Evolution of Augmenting Topologies) algorithm.
+This is a university project for learning neuroevolution by programming and training a bot to complete the first level of the original Super Mario Bros. for the NES using the NEAT (Neuro Evolution of Augmenting Topologies) algorithm (neat-python docs: https://neat-python.readthedocs.io/en/latest/index.html).
 
 # Results
 
@@ -82,7 +82,7 @@ This function allows a user to play Super Mario Bros themselves with their own f
 # Config.txt
 
 The config file is located in src. This is the main controller of the NEAT algorithm and is very sensitive to change. Take caution in making any modifications
-to this file, the parameters are already well optimized for this task so you shouldnt need to. If you must, there are only 5 settings you will ever need to modify:
+to this file. The parameters are already well optimized for this task so you shouldnt need to touch anything. If you must, there are only 5 settings you will ever need to modify:
 
 ```
 pop_size                = 150   # Defines the number of genomes per generation. Massive impact on training results/speed.
@@ -91,6 +91,6 @@ node_add_prob           = 0.10  # The probability of a node being added to a hid
 compatibility_threshold = 2.2   # Controls speciation, if two species of genomes are less diverse than this threshold they are combined, otherwise kept seperate.
 max_stagnation          = 15    # The limit on how long a species can survive without improvement in best_fitness.
 ```
-
+See https://neat-python.readthedocs.io/en/latest/config_file.html for more details on the config.
 
 
