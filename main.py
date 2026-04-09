@@ -31,6 +31,9 @@ def run(args):
 def run_human(args):
     run_human_environment()
 
+"""
+parser for creating the CLI, allows control/calling of all three primary scripts created in the project (train, run, runHuman).
+"""
 def create_parser():
     parser = argparse.ArgumentParser(description="Command Line interface for interacting with Super Mario NEAT bot")
     subparsers = parser.add_subparsers(dest="command", required=True)

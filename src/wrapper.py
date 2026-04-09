@@ -48,27 +48,6 @@ class CropObservation(ObservationWrapper):
     def observation(self, observation):
         return observation[self.top:self.bottom, self.left:self.right]
 
-def printObservation(env):
-    observation = np.array(env)
-
-    if observation.ndim == 4:
-        observation = observation[-1]
-
-    if observation.ndim == 3 and observation.shape[-1] == 1:
-        observation = observation[:, :, 0]
-
-    if observation.ndim == 3 and observation.shape[0] in (2, 4):
-        observation = observation[-1]
-
-    if observation.ndim == 2:
-        plt.imshow(observation, cmap="gray")
-    else:
-        plt.imshow(observation)
-
-    plt.axis("off")
-    plt.show()
-
-
 def apply_wrappers(env):
     """
     Helper function to apply wrappers one by one, preprocessing the frames

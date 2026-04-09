@@ -10,21 +10,6 @@ import time
 from nes_py.wrappers import JoypadSpace
 from gym_super_mario_bros.actions import COMPLEX_MOVEMENT
 
-# Initialize the environment and game for Level 1-1
-ENV_NAME = "SuperMarioBros-1-1-v0"
-env = gym_super_mario_bros.make(ENV_NAME)
-env = JoypadSpace(env, COMPLEX_MOVEMENT)
-env.reset()
-
-# Initialize Pygame
-pygame.init()
-window_width, window_height = 800, 600
-screen = pygame.display.set_mode((window_width, window_height))
-pygame.display.set_caption("Play Super Mario Bros (NES) - Level 1-1")
-
-# Pygame clock to limit FPS
-clock = pygame.time.Clock()
-
 key_map = {
     K_a: 8,        # A button (Jump) at index 8
     K_s: 0,        # B button (Run/Fireball) at index 0
@@ -85,11 +70,29 @@ def convert_action_to_complex(action_array):
     return ['NOOP']  # Default to 'NOOP' if no match
 
 def run_human_environment():
-    start_time = time.time()
+
+    # Initialize the environment and game for Level 1-1
+    ENV_NAME = "SuperMarioBros-1-1-v0"
+    env = gym_super_mario_bros.make(ENV_NAME)
+    env = JoypadSpace(env, COMPLEX_MOVEMENT)
+    env.reset()
+
+    # Initialize Pygame
+    pygame.init()
+    window_width, window_height = 800, 600
+    screen = pygame.display.set_mode((window_width, window_height))
+    pygame.display.set_caption("Play Super Mario Bros (NES) - Level 1-1")
+
+    # Pygame clock to limit FPS
+    clock = pygame.time.Clock()
+
+    # initialize variables
     prev_x_pos = 0
     fitness = 0
     max_x_pos = 0
     done = False
+
+    # main gameplay loop
     try:
         while not done:
             # Limit the frame rate to 90 FPS
@@ -127,7 +130,7 @@ def run_human_environment():
             action_index = COMPLEX_MOVEMENT.index(complex_action)
             obs, rew, done, info = env.step(action_index)
 
-            # reward forward movement
+            # Fitness function (pulled from train.py)
             x_pos = info.get("x_pos", 0)
             progress = x_pos - prev_x_pos
             if progress > 0:
@@ -138,16 +141,17 @@ def run_human_environment():
 
             if (x_pos > max_x_pos):
                 max_x_pos = x_pos
-            
-
-            # time penalty to encourage fast movement
             fitness -= 0.2
+
+
             print("Fitness:", round(fitness))
     except KeyboardInterrupt:
         print("Exiting...")
 
 
     env.close()
+
+    # final fitness updates
     fitness += max_x_pos * 0.5
     checkpoints = {200:50, 400:75, 600:100, 800:150, 1200:250, 1600:400, 2000:600, 2500:1000, 3000:1500}
     awarded_checkpoints = set()
