@@ -23,19 +23,14 @@ from src.bestGenomeReporter import BestGenomeReporter
 from neat import Checkpointer
 
 
-# Set up the environment
-ENV_NAME = "SuperMarioBros-1-1-v0"
-def env_setup(evn_name):
-
-    env = gym_super_mario_bros.make(evn_name)
-    env = JoypadSpace(env, RIGHT_ONLY)
-    env = apply_wrappers(env)
-    return env
 
 def eval_genome(genome, config):
 
     network = neat.nn.FeedForwardNetwork.create(genome, config)
-    env = env_setup(ENV_NAME)
+    ENV_NAME = "SuperMarioBros-1-1-v0"
+    env = gym_super_mario_bros.make(ENV_NAME)
+    env = JoypadSpace(env, RIGHT_ONLY)
+    env = apply_wrappers(env)
 
     state = env.reset()
     #print(np.array(state).shape)
@@ -99,7 +94,7 @@ def eval_genome(genome, config):
 
     return fitness
 
-def train_neat(config_path):
+def train_neat(config_path, generations, resume_training, report_stats, save_checkpoints, checkpoint_interval, save_genomes):
     config = neat.Config(
         neat.DefaultGenome,
         neat.DefaultReproduction,
@@ -108,29 +103,36 @@ def train_neat(config_path):
         config_path
     )
 
-    #population = neat.Population(config)
-    population = neat.Checkpointer.restore_checkpoint("neat_checkpoints/neat-checkpoint-521")
+    if resume_training != None:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        population = neat.Checkpointer.restore_checkpoint(os.path.join(root, resume_training))
+    else:
+        population = neat.Population(config)
 
-    population.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    population.add_reporter(stats)
-    population.add_reporter(BestGenomeReporter())
+    if report_stats == True:
+        population.add_reporter(neat.StdOutReporter(True))
+        stats = neat.StatisticsReporter()
+        population.add_reporter(stats)
 
-    os.makedirs("neat_checkpoints", exist_ok=True)
-    population.add_reporter(Checkpointer(
-        generation_interval=100,
-        filename_prefix="neat_checkpoints/neat-checkpoint-"
-    ))
+    if save_checkpoints != None:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        checkpoint_directory = os.path.join(root, save_checkpoints)
+        os.makedirs(os.path.join(root, save_checkpoints), exist_ok=True)
+        population.add_reporter(Checkpointer(
+            generation_interval=checkpoint_interval,
+            filename_prefix= os.path.join(checkpoint_directory, "neat-checkpoint-")
+        ))
+
+    if save_genomes != None:
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        population.add_reporter(BestGenomeReporter(os.path.join(root, save_genomes)))
 
 
     num_workers = max(1, os.cpu_count() - 1)
-
     with ParallelEvaluator(num_workers, eval_genome) as pe:
-        winner = population.run(pe.evaluate, 5000)
-
+        winner = population.run(pe.evaluate, generations)
     with open("best_genome.pkl", "wb") as f:
         pickle.dump(winner, f)
-
     print("\nBest genome saved!")
 
 if __name__ == "__main__":

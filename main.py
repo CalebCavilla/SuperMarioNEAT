@@ -1,95 +1,46 @@
-# OS imports
+import argparse
 import os
-import warnings
-os.environ["PYTHONWARNINGS"] = "ignore"
-warnings.filterwarnings("ignore", category=DeprecationWarning)
-
-# gym environment imports
-import gym
-import gym_super_mario_bros
-from nes_py.wrappers import JoypadSpace
-from gym_super_mario_bros.actions import RIGHT_ONLY
-
-# wrapper import
-from wrapper import apply_wrappers
-
-# utility imports
-import neat
-from neat.parallel import ParallelEvaluator
-import numpy as np
 import pickle
-from bestGenomeReporter import BestGenomeReporter
+import sys
+import neat
 
+from src.train import train_neat
 
-# Set up the environment
-ENV_NAME = "SuperMarioBros-1-1-v0"
-def env_setup(evn_name):
-    env = gym_super_mario_bros.make(evn_name)
-    env = JoypadSpace(env, RIGHT_ONLY)
-    env = apply_wrappers(env)
-    return env
-
-def eval_genome(genome, config):
-
-    network = neat.nn.FeedForwardNetwork.create(genome, config)
-    env = env_setup(ENV_NAME)
-
-    state = env.reset()
-    done = False
-    max_x_pos = 40
-    idle_timer = 150
-    step = 0
-
-    while not done:
-        inputs = np.array(state).flatten()
-        outputs = network.activate(inputs)
-        action = int(np.argmax(outputs))
-
-        state, reward, done, info = env.step(action)
-        step += 1
-
-        x_pos = info.get("x_pos")
-
-        if (x_pos > max_x_pos):
-            max_x_pos = x_pos
-            idle_timer = 150
-        else:
-            idle_timer -= 1
-
-        if idle_timer <= 0:
-            break
-    
-    env.close()
-
-    return max_x_pos - 0.1*step
-
-def train_neat(config_path):
-    config = neat.Config(
-        neat.DefaultGenome,
-        neat.DefaultReproduction,
-        neat.DefaultSpeciesSet,
-        neat.DefaultStagnation,
-        config_path
+# Train Function
+def train(args):
+    train_neat(
+        config_path = args.config,
+        generations = args.generations,
+        resume_training= args.resume_training,
+        report_stats = args.report_stats,
+        save_checkpoints = args.save_checkpoints,
+        checkpoint_interval = args.checkpoint_interval,
+        save_genomes = args.save_genomes
     )
 
-    population = neat.Population(config)
+def create_parser():
+    parser = argparse.ArgumentParser(description="Command Line interface for interacting with Super Mario NEAT bot")
+    subparsers = parser.add_subparsers(dest="command", required=True)
 
-    population.add_reporter(neat.StdOutReporter(True))
-    stats = neat.StatisticsReporter()
-    population.add_reporter(stats)
-    population.add_reporter(BestGenomeReporter())
+    # Training Parser
+    train_parser = subparsers.add_parser("train", help="Train the bot from scratch or resume from checkpoint")
+    train_parser.add_argument("--config", type=str, default="src/config.txt", help="path to NEAT config file")
+    train_parser.add_argument("--generations", type=int, default=2500, help="Number of generations to train for")
+    train_parser.add_argument("--resume_training", type=str, default=None, help="The path to the checkpoint file to resume training from (If not set, training will begin from fresh population)")
+    train_parser.add_argument("--report_stats", action="store_true", default=True, help="Reports per generation stats to the console like best_fitness and speciation")
+    train_parser.add_argument("--no_report_stats", action="store_false", dest="report_stats", help="Prevents stat reporting in console")
+    train_parser.add_argument("--save_checkpoints", type=str, default=None, help="The Path to the folder where checkpoints are saved (if not set, checkpoints are NOT saved)")
+    train_parser.add_argument("--checkpoint_interval", type=int, default=10, help="How many generations per checkpoint save")
+    train_parser.add_argument("--save_genomes", type=str, default=None, help="Saves genomes for replay (if not set, genomes are NOT saved)")
+    train_parser.set_defaults(func=train)
 
-    num_workers = max(1, os.cpu_count() - 1)
+    return parser
 
-    with ParallelEvaluator(num_workers, eval_genome) as pe:
-        winner = population.run(pe.evaluate, 2000)
+def main():
+    parser = create_parser()
+    args = parser.parse_args()
+    args.func(args)
 
-    with open("best_genome.pkl", "wb") as f:
-        pickle.dump(winner, f)
-
-    print("\nBest genome saved!")
 
 if __name__ == "__main__":
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config.txt")
-    train_neat(config_path)
+    main()
