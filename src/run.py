@@ -56,10 +56,3 @@ def run_trained_genome(config_path, genome_path):
         time.sleep(0.02)
 
     env.close()
-
-
-if __name__ == "__main__":
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config.txt")
-    genome_path = os.path.join(local_dir, "best_genomes/gen_2235_best.pkl")
-    run_trained_genome(config_path, genome_path)

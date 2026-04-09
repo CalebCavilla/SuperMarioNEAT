@@ -6,6 +6,7 @@ import neat
 
 from src.train import train_neat
 from src.run import run_trained_genome
+from src.runHuman import run_human_environment
 
 # Train Function
 def train(args):
@@ -25,6 +26,10 @@ def run(args):
         config_path = args.config,
         genome_path = args.genome
     )
+
+# Run Human Function
+def run_human(args):
+    run_human_environment()
 
 def create_parser():
     parser = argparse.ArgumentParser(description="Command Line interface for interacting with Super Mario NEAT bot")
@@ -47,6 +52,10 @@ def create_parser():
     run_parser.add_argument("--config", type=str, default="src/config.txt", help="path to NEAT config file")
     run_parser.add_argument("--genome", type=str, required=True, help="path to trained genome to be run")
     run_parser.set_defaults(func=run)
+
+    # Run Human Parser
+    run_human_parser = subparsers.add_parser("run_human", help="Run a simulated Mario environment for human gameplay")
+    run_human_parser.set_defaults(func=run_human)
 
     return parser
 

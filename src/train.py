@@ -82,10 +82,6 @@ def eval_genome(genome, config):
 
     fitness += max_x_pos * 0.5
 
-    # # Penalize dying before finishing
-    # if not info.get("flag_get", False):
-    #     fitness -= 100
-
     for cp, bonus in checkpoints.items():
         if x_pos >= cp and cp not in awarded_checkpoints:
             fitness += bonus
@@ -134,8 +130,3 @@ def train_neat(config_path, generations, resume_training, report_stats, save_che
     with open("best_genome.pkl", "wb") as f:
         pickle.dump(winner, f)
     print("\nBest genome saved!")
-
-if __name__ == "__main__":
-    local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, "config.txt")
-    train_neat(config_path)
