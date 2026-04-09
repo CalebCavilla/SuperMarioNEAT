@@ -57,7 +57,7 @@ To train the bot from scratch with no options (default config, 2500 generations,
 ### Solution setup
 ``` python main.py train --save_checkpoints checkpoints --save_genomes genomes ```
 
-# Running Trained Models
+## Running Trained Models
 
 This function allows viewing of a pre-trained genome completing level 1-1 without evolutionary pressure
 
@@ -71,10 +71,26 @@ This function allows viewing of a pre-trained genome completing level 1-1 withou
 
 ```python main.py run --genome genome/best_genome.plk```
 
-# Playing has a Human
+## Playing has a Human
 
 This function allows a user to play Super Mario Bros themselves with their own fitness score for compairison and testing against the bots
 
 ### Example
 
 ``` python main.py runHuman ```
+
+# Config.txt
+
+The config file is located in src. This is the main controller of the NEAT algorithm and is very sensitive to change. Take caution in making any modifications
+to this file, the parameters are already well optimized for this task so you shouldnt need to. If you must, there are only 5 settings you will ever need to modify:
+
+```
+pop_size                = 150   # Defines the number of genomes per generation. Massive impact on training results/speed.
+conn_add_prob           = 0.3   # The probability of a connection being made between nodes in the network per generation. Moderates network complexity, large impact on speed.
+node_add_prob           = 0.10  # The probability of a node being added to a hidden layer per generation. Morderates network complexity, large impact on speed.
+compatibility_threshold = 2.2   # Controls speciation, if two species of genomes are less diverse than this threshold they are combined, otherwise kept seperate.
+max_stagnation          = 15    # The limit on how long a species can survive without improvement in best_fitness.
+```
+
+
+
