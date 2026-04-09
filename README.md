@@ -55,7 +55,7 @@ To train the bot from scratch with no options (default config, 2500 generations,
 ```python main.py train --resume_training checkpoints/neat-checkpoint-50```
 
 ### Solution setup
-``` python main.py train --save_checkpoints checkpoints --checkpoint_interval 100 --save_genomes genomes ```
+``` python main.py train --save_checkpoints checkpoints --save_genomes genomes ```
 
 # Running Trained Models
 
