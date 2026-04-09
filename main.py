@@ -5,6 +5,7 @@ import sys
 import neat
 
 from src.train import train_neat
+from src.run import run_trained_genome
 
 # Train Function
 def train(args):
@@ -16,6 +17,13 @@ def train(args):
         save_checkpoints = args.save_checkpoints,
         checkpoint_interval = args.checkpoint_interval,
         save_genomes = args.save_genomes
+    )
+
+# Run Function
+def run(args):
+    run_trained_genome(
+        config_path = args.config,
+        genome_path = args.genome
     )
 
 def create_parser():
@@ -33,6 +41,12 @@ def create_parser():
     train_parser.add_argument("--checkpoint_interval", type=int, default=10, help="How many generations per checkpoint save")
     train_parser.add_argument("--save_genomes", type=str, default=None, help="Saves genomes for replay (if not set, genomes are NOT saved)")
     train_parser.set_defaults(func=train)
+
+    # Run Parser
+    run_parser = subparsers.add_parser("run", help="Run a pre-trained model to see how it performs")
+    run_parser.add_argument("--config", type=str, default="src/config.txt", help="path to NEAT config file")
+    run_parser.add_argument("--genome", type=str, required=True, help="path to trained genome to be run")
+    run_parser.set_defaults(func=run)
 
     return parser
 
