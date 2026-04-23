@@ -30,7 +30,7 @@ def run_trained_genome(config_path, genome_path):
         with open(genome_path, "rb") as f:
             trained_genome = pickle.load(f)
     except:
-        print("Unable to load genome correctly! Check path or file type (should be plk!)")
+        print("Unable to load genome correctly! Check path or file type (should be pkl!)")
         exit()
     net = neat.nn.FeedForwardNetwork.create(trained_genome, config)
 
